@@ -1,77 +1,78 @@
-# GENERATION OF LEXICAL TOKENS LEX FLEX TOOL
-## Reg No:212222040045
+# Ex.No:3
+   RECOGNITION-OF-A-VALID-ARITHMETIC-EXPRESSION-THAT-USES-OPERATOR-AND-USING-YACC
+## Register Number:212222040045
 
-
-
-# AIM
- To write a lex program to implement lexical analyzer to recognize a few patterns.
- 
-# ALGORITHM
-
+## AIM
+To write a yacc program to recognize a valid arithmetic expression that uses operator +,- ,* and /.
+## ALGORITHM
 1.	Start the program.
-2.	Lex program consists of three parts.
-a.	Declaration %%
-b.	Translation rules %%
-c.	Auxilary procedure.
-3.	The declaration section includes declaration of variables, maintest, constants and regular definitions.
-4.	Translation rule of lex program are statements of the form
-a.	P1 {action}
-b.	P2 {action}
-c.	…
-d.	…
-e.	Pn {action}
-5.	Write a program in the vi editor and save it with .l extension.
-6.	Compile the lex program with lex compiler to produce output file as lex.yy.c. eg $ lex filename.l $ cc lex.yy.c
-7.	Compile that file with C compiler and verify the output.
-
-# INPUT
-
+2.	Write a program in the vi editor and save it with .l extension.
+3.	In the lex program, write the translation rules for the operators =,+,-,*,/ and for the identifier.
+4.	Write a program in the vi editor and save it with .y extension.
+5.	Compile the lex program with lex compiler to produce output file as lex.yy.c. eg $ lex filename.l
+6.	Compile the yacc program with yacc compiler to produce output file as y.tab.c. eg $ yacc –d arith_id.y
+7.	Compile these with the C compiler as gcc lex.yy.c y.tab.c
+8.	Enter an arithmetic expression as input and the tokens are identified as output.
+## PROGRAM
+## exp3.l
 ```
+// arth.l file
+%{
+#include "y.tab.h"
+%}
+
+%%
+
+"=" { printf("\n Operator is EQUAL"); return '='; } "+" { printf("\n Operator is PLUS"); return PLUS; }
+"-" { printf("\n Operator is MINUS"); return MINUS; }
+"/" { printf("\n Operator is DIVISION"); return DIVISION; }
+"*" { printf("\n Operator is MULTIPLICATION"); return MULTIPLICATION; } [a-zA-Z]*[0-9]* { printf("\n Identifier is %s", yytext); return ID; }
+. { return yytext[0]; }
+\n { return 0; }
+
+%%
+
+int yywrap() { return 1;
+}
+```
+# arth.y
+```
+
+%{
 #include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+/* This YACC program is for recognizing the Expression */
+%}
 
-int isKeyword(char buffer[]) {
-    char keywords[5][10] = {"if", "else", "while", "for", "int"};
-    for (int i = 0; i < 5; ++i) {
-        if (strcmp(buffer, keywords[i]) == 0) {
-            return 1;
-        }
-    }
-    return 0;
+%token ID PLUS MINUS MULTIPLICATION DIVISION
+
+%%
+
+statement: ID '=' E {
+printf("\nValid arithmetic expression");
+$$ = $3;
+}
+;
+
+E: E PLUS ID
+| E MINUS ID
+| E MULTIPLICATION ID
+| E DIVISION ID
+| ID
+;
+
+%%
+extern FILE* yyin; int main() {
+do {
+yyparse();
+} while (!feof(yyin)); return 0;
 }
 
-int main() {
-    char ch, buffer[15];
-    char operators[] = "+-*/=";
-    int i = 0;
-
-    printf("Enter your input: ");
-    
-    while ((ch = getchar()) != EOF) {
-        if (strchr(operators, ch)) {
-            printf("Operator: %c\n", ch);
-        } else if (isalnum(ch)) {
-            buffer[i++] = ch;
-        } else if ((ch == ' ' || ch == '\n' || ch == '\t') && i != 0) {
-            buffer[i] = '\0';
-
-            if (isKeyword(buffer)) {
-                printf("Keyword: %s\n", buffer);
-            } else if (isdigit(buffer[0])) {
-                printf("Number: %s\n", buffer);
-            } else {
-                printf("Identifier: %s\n", buffer);
-            }
-            i = 0;
-        }
-    }
-
-    return 0;
+void yyerror(char *s) { fprintf(stderr, "Error: %s\n", s);
 }
+
 ```
-# OUTPUT
-![Screenshot 2025-04-07 133803](https://github.com/user-attachments/assets/0e5f32a3-d6f1-4fa2-83c9-5b69d1b52570)
+## OUTPUT
+![Screenshot 2025-04-23 164951](https://github.com/user-attachments/assets/9e2d5713-7a1e-4ee7-8722-9423d099216a)
 
-# RESULT
-The lexical analyzer is implemented using lex and the output is verified.
+## RESULT
+A YACC program to recognize a valid arithmetic expression that uses operator +,-,* and / is executed successfully and the output is verified.
